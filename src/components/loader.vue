@@ -7,17 +7,10 @@
 <script>
 export default {
     name:'fantasyLoader',
-
 }
 </script>
 
-<style lang="scss">
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
+<style lang="scss">  
   .loader-body {
     display: flex;
     justify-content: center;
