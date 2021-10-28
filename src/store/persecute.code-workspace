@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "../.."
+		},
+		{
+			"path": "../../../../html"
+		},
+		{
+			"path": "../../../../DIY-novel-vue"
+		}
+	],
+	"settings": {
+		"px-to-rem.px-per-rem": 50
+	}
+}

@@ -1,12 +1,17 @@
 <template>
-  <div class="colorTime">
+  <div class="colorTime" :key="id">
     <div class="days" v-if="day > 0">
       <span class="downTime">{{ this.day }}</span
       ><span class="downTime" style="font-size: 35px; margin-left: 8px"
         >天</span
       >
     </div>
-    <span class="downTime" style="margin-left: 20px">{{ nowTime }}</span>
+    <span
+      class="downTime"
+      :class="{ noleft: day === 0 }"
+      style="margin-left: 20px; min-width: 48%"
+      >{{ nowTime }}</span
+    >
   </div>
 </template>
 
@@ -18,8 +23,17 @@ export default {
       nowTime: "",
       day: 0,
       interValFlag: null,
-      targetTime: "2022-12-22 00:00:00",
     };
+  },
+  props: {
+    targetTime: {
+      type: String,
+      default: "2022-12-21 00:00:00",
+    },
+    id: {
+      type: Number,
+      default: -1,
+    },
   },
   methods: {
     changTime() {
@@ -28,20 +42,37 @@ export default {
       const timesValue = times.getTime();
       const targetValue = targetTime.getTime();
       const delta = targetValue - timesValue;
-      this.day = Math.floor(delta / 3600 / 1000 / 24);
-      const hour = Math.floor((delta / 3600 / 1000) % 24);
-      const minute = Math.floor((delta / 60 / 1000) % 60);
-      const second = Math.floor((delta / 1000) % 60);
-      let str = "" + (hour < 10 ? "0" : "") + hour;
-      str += (minute < 10 ? ":0" : ":") + minute;
-      str += (second < 10 ? ":0" : ":") + second;
-      this.nowTime = str;
+      if (delta > 0) {
+        this.day = Math.floor(delta / 3600 / 1000 / 24);
+        const hour = Math.floor((delta / 3600 / 1000) % 24);
+        const minute = Math.floor((delta / 60 / 1000) % 60);
+        const second = Math.floor((delta / 1000) % 60);
+        let str = "" + (hour < 10 ? "0" : "") + hour;
+        str += (minute < 10 ? ":0" : ":") + minute;
+        str += (second < 10 ? ":0" : ":") + second;
+        this.nowTime = str;
+        this.$store.commit("changeDownEnd", false);  // 倒计时还没有结束
+      } else if (delta <= 0) {
+        clearInterval(this.interValFlag);
+        this.nowTime = "00:00:00";
+        this.$store.commit("changeDownEnd", true); // 倒计时结束了
+      }
+      console.log(this.id,this.$store.state.downEndFlag);
     },
   },
   created() {
-    this.interValFlag = setInterval(() => this.changTime(), 1000);
+    this.changTime();
   },
-  destroyed() {
+  watch: {
+    nowTime() {
+      if (this.$store.state.downEndFlag) {
+        return
+      }
+      clearInterval(this.interValFlag)
+      this.interValFlag = setInterval(() => this.changTime(), 1000);
+    },
+  },
+  beforeDestroy() {
     clearInterval(this.interValFlag);
   },
 };
@@ -56,10 +87,10 @@ export default {
   justify-content: center;
   height: 1.2rem;
   align-items: center;
-  .days{
-	display: flex;
-	align-items: center;
-}
+  .days {
+    display: flex;
+    align-items: center;
+  }
 }
 /* 引入字体文件 */
 @font-face {
@@ -90,6 +121,9 @@ export default {
   /* 变色的具体教程在第一期视频！ */
   /* 让字梦幻一点 */
   text-shadow: 0 0 0.08rem rgba(255, 255, 255, 0.7);
+}
+.noleft {
+  margin-left: 0 !important;
 }
 @keyframes timeColor {
   to {
