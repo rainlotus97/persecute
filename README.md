@@ -1,7 +1,5 @@
 # persecute
 
-暂未完成
-
 ## Project setup
 ```
 yarn install
